@@ -1,7 +1,7 @@
 import sqlite3
 
 create_database = lambda name: sqlite3.connect(name)
-
+tuple_format = lambda s: repr("''".join(s.split("'")))
 
 def check_table(table_name, database):
     """
@@ -69,11 +69,12 @@ def insert_tuple(table_name, database, tuple):
     :param tuple: record to insert in type(str) REMEMBER: insert string with double single quotes
     :return: True if inserted else False
     """
+    tuple = tuple_format(tuple)
     assert not isinstance(tuple, str), "'tuple' parameter is not str"
     assert not isinstance(table_name, str), "'table_name' parameter is not str"
     assert not isinstance(database, sqlite3.Connection), "'database' parameter is not a database connection"
     columns_name = ','.join(get_column_names(table_name, database))
-    values = ','.join(tuple)
+    values = tuple
     status = database.execute("INSERT INTO " + repr(table_name) + "(" + columns_name + ") VALUES (" + values + ");")
     database.commit()
     if status:
@@ -143,6 +144,7 @@ def update_tuple(table_name, database, update, condition):
     Example:{id:5 , name:'abc' , number:5679 }
     :return: True if updated else False
     """
+    
     assert not isinstance(table_name, str), "'table_name' parameter is not str"
     assert not isinstance(database, sqlite3.Connection), "'database' parameter is not a database connection"
     where_clause = ' AND '.join([str(i) + ' == ' + str(condition[i]) for i in condition])
